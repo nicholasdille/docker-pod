@@ -2,6 +2,126 @@
 
 set -o errexit
 
+: "${DOCKER_CONFIG:=${HOME}/.docker}"
+
+main() {
+    if test "$0" == "-bash"; then
+        :
+
+    elif test "$(dirname "$0")" == "${DOCKER_CONFIG}/cli-plugins"; then
+        docker_cli_command "$@"
+
+    else
+        script "$@"
+
+    fi
+}
+
+script() {
+    case "$1" in
+        install)
+            mkdir -p ${DOCKER_CONFIG}/cli-plugins
+            cp "$0" ${DOCKER_CONFIG}/cli-plugins/docker-pod
+            chmod +x ${DOCKER_CONFIG}/cli-plugins/docker-pod
+            exit
+        ;;
+    esac
+
+    handler "$@"
+}
+
+docker_cli_command() {
+    case "${1}" in
+        docker-cli-plugin-metadata)
+            cat <<-EOF
+{
+    "SchemaVersion":    "0.1.0",
+    "Vendor":           "Nicholas Dille",
+    "Version":          "0.7.0",
+    "ShortDescription": "Manage pods",
+    "URL":              "https://github.com/nicholasdille/docker-pod"
+}
+EOF
+        exit
+        ;;
+    esac
+
+    # Remove "pod" from arguments
+    shift
+
+    handler "$@"
+}
+
+handler() {
+    case "$1" in
+        install)
+            echo TODO: INSTALL
+        ;;
+        create|add|remove|delete|list|logs|exec|run)
+            verb=$1
+            shift
+
+            if test "$1" == "--help"; then
+                eval "help_${verb}"
+                exit
+            fi
+
+            if test "$#" -eq 0; then
+                >&2 echo "ERROR: Missing pod name."
+                help
+                exit 1
+            fi
+
+            pod_name=$1
+            shift
+        ;;
+        *)
+            >&2 echo "ERROR: Missing or unsupported verb."
+            help
+            exit
+        ;;
+    esac
+
+    case ${verb} in
+        add|remove|logs|exec|run)
+            if test "$#" -eq 0; then
+                >&2 echo "ERROR: Missing container name."
+                help
+                exit 1
+            fi
+            container_name=$1
+            shift
+        ;;
+    esac
+
+    case "${verb}" in
+        create)
+            pod_create "${pod_name}" "$@"
+        ;;
+        add)
+            pod_add "${pod_name}" "${container_name}" "$@"
+        ;;
+        remove)
+            pod_remove "${pod_name}" "${container_name}"
+        ;;
+        delete)
+            pod_delete "${pod_name}"
+        ;;
+        list)
+            pod_list "${pod_name}" "$@"
+        ;;
+        logs)
+            pod_logs "${pod_name}" "${container_name}" "$@"
+        ;;
+        exec)
+            pod_exec "${pod_name}" "${container_name}" "$@"
+        ;;
+        run)
+            pod_run "${pod_name}" "${container_name}" "$@"
+        ;;
+    esac
+}
+
 help() {
     cat <<EOF
 Usage: docker pod <command> <pod_name> [<container_name>] [<options>]
@@ -20,7 +140,7 @@ EOF
 
 pod_exists() {
     local pod_name=$1
-    
+
     # Command returns:
     # - one line if container does not exist (only headers)
     # - two lines if container exists
@@ -74,7 +194,7 @@ Pod options:
 
 Docker options:
 EOF
-docker run --help | tail -n +7 | grep -v -- --help
+    docker run --help | tail -n +7 | grep -v -- --help
 }
 
 pod_add() {
@@ -184,7 +304,7 @@ Pod options:
 
 Docker options:
 EOF
-docker ps --help | tail -n +8
+    docker ps --help | tail -n +8
 }
 
 pod_list() {
@@ -222,7 +342,7 @@ Pod options:
 
 Docker options:
 EOF
-docker logs --help | tail -n +7
+    docker logs --help | tail -n +7
 }
 
 pod_logs() {
@@ -321,88 +441,4 @@ pod_run() {
     docker run -it --rm --network container:pod_${pod_name}_sleeper --pid container:pod_${pod_name}_sleeper "$@"
 }
 
-case "${1}" in
-    docker-cli-plugin-metadata)
-        cat <<-EOF
-{
-    "SchemaVersion":"0.1.0",
-    "Vendor":"Nicholas Dille",
-    "Version":"0.7.0",
-    "ShortDescription":"Manage pods",
-    "URL":"https://github.com/nicholasdille/docker-pod"
-}
-EOF
-    exit
-    ;;
-esac
-
-# Remove "pod" from arguments
-shift
-
-case "$1" in
-    install)
-        echo TODO: INSTALL
-    ;;
-    create|add|remove|delete|list|logs|exec|run)
-        verb=$1
-        shift
-
-        if test "$1" == "--help"; then
-            eval "help_${verb}"
-            exit
-        fi
-
-        if test "$#" -eq 0; then
-            >&2 echo "ERROR: Missing pod name."
-            help
-            exit 1
-        fi
-
-        pod_name=$1
-        shift
-    ;;
-    *)
-        >&2 echo "ERROR: Missing or unsupported verb."
-        help
-        exit
-    ;;
-esac
-
-case ${verb} in
-    add|remove|logs|exec|run)
-        if test "$#" -eq 0; then
-            >&2 echo "ERROR: Missing container name."
-            help
-            exit 1
-        fi
-        container_name=$1
-        shift
-    ;;
-esac
-
-case "${verb}" in
-    create)
-        pod_create "${pod_name}" "$@"
-    ;;
-    add)
-        pod_add "${pod_name}" "${container_name}" "$@"
-    ;;
-    remove)
-        pod_remove "${pod_name}" "${container_name}"
-    ;;
-    delete)
-        pod_delete "${pod_name}"
-    ;;
-    list)
-        pod_list "${pod_name}" "$@"
-    ;;
-    logs)
-        pod_logs "${pod_name}" "${container_name}" "$@"
-    ;;
-    exec)
-        pod_exec "${pod_name}" "${container_name}" "$@"
-    ;;
-    run)
-        pod_run "${pod_name}" "${container_name}" "$@"
-    ;;
-esac
+main "$@"
