@@ -37,7 +37,7 @@ docker_cli_command() {
 {
     "SchemaVersion":    "0.1.0",
     "Vendor":           "Nicholas Dille",
-    "Version":          "0.7.0",
+    "Version":          "0.8.0",
     "ShortDescription": "Manage pods",
     "URL":              "https://github.com/nicholasdille/docker-pod"
 }
