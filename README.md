@@ -11,9 +11,7 @@ This plugin add the manual management of pods to Docker. You can create a pods, 
 1. Copy `docker-pod.sh` to `~/.docker/cli-plugins`:
 
     ```bash
-    mkdir -p ~/.docker/cli-plugins
-    cp docker-pod.sh ~/.docker/cli-plugins/docker-pod
-    chmod +x ~/.docker/cli-plugins/docker-pod
+    bash docker-pod.sh install
     ```
 
 1. Call `docker` and make sure it lists the CLI plugin `pod`:
@@ -38,7 +36,7 @@ This plugin add the manual management of pods to Docker. You can create a pods, 
 
 ## Internals
 
-This plugin manages pod by creating a dummy container representing the pod. 
+This plugin manages pod by creating a dummy container representing the pod.
 
 Additional containers are started next to the dummy container and shares the network as well as the PID namespace.
 
