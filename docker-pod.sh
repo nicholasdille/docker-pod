@@ -21,6 +21,12 @@ EOF
 pod_exists() {
     local pod_name=$1
     
+    # Command returns:
+    # - one line if container does not exist (only headers)
+    # - two lines if container exists
+    # Function returns:
+    # - 0 if container exists
+    # - 1 if container does not exist
     return $(( 2 - $(docker ps --filter name=pod_${pod_name}_sleeper | wc -l) ))
 }
 
