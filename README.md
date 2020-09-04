@@ -85,7 +85,7 @@ CONTAINER ID        NAMES               IMAGE               STATUS
 1e31f69e597d        pod_foo_sleeper     ubuntu              Up 9 minutes
 ```
 
-XXX options
+The `add` command accepts the Docker options before the image name as well as command line arguments for the command. Consider the following example:
 
 ```bash
 $ docker pod add foo dind --privileged docker:stable-dind dockerd --host tcp://127.0.0.1:2375
