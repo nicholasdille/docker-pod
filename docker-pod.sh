@@ -67,9 +67,9 @@ pod_create() {
 
 help_add() {
     cat <<EOF
-Usage: docker pod add <pod_name> <container_name> [<docker_options>] <image_name> [<arguments>]
+Usage: docker pod add <pod_name> <container_name> [<options>] <image_name> [<arguments>]
 
-Options:
+Pod options:
   -h, --help           Display this message
 
 Docker options:
@@ -179,7 +179,7 @@ help_list() {
     cat <<EOF
 Usage: docker pod list <pod_name> [<options>]
 
-Options:
+Pod options:
     --help    Display this message
 
 Docker options:
@@ -217,7 +217,7 @@ help_logs() {
     cat <<EOF
 Usage: docker pod logs <pod_name> <container_name> [<options>]
 
-Options:
+Pod options:
   -h, --help           Display this message
 
 Docker options:
@@ -288,7 +288,7 @@ help_run() {
     cat <<EOF
 Usage: docker pod run <pod_name> [<docker_options>] <image_name> <command> [<arguments>]
 
-Options:
+Pod options:
   -h, --help                           Display this message
 
 Docker options:
@@ -349,6 +349,7 @@ case "$1" in
 
         if test "$1" == "--help"; then
             eval "help_${verb}"
+            exit
         fi
 
         if test "$#" -eq 0; then
