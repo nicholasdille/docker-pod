@@ -2,6 +2,7 @@
 
 set -o errexit
 
+: "${POD_SHARE_PID_NAMESPACE:=false}"
 : "${DOCKER_CONFIG:=${HOME}/.docker}"
 
 main() {
@@ -221,7 +222,11 @@ pod_add() {
         exit 1
     fi
 
-    docker run -d --name pod_${pod_name}_${container_name} --network container:pod_${pod_name}_sleeper --pid container:pod_${pod_name}_sleeper "$@"
+    if test "${POD_SHARE_PID_NAMESPACE}" == "true"; then
+        POD_EXTRA_ARGS="--pid container:pod_${pod_name}_sleeper"
+    fi
+
+    docker run -d --name pod_${pod_name}_${container_name} --network container:pod_${pod_name}_sleeper ${POD_EXTRA_ARGS} "$@"
 }
 
 help_remove() {
@@ -438,7 +443,11 @@ pod_run() {
         exit 1
     fi
 
-    docker run -it --rm --network container:pod_${pod_name}_sleeper --pid container:pod_${pod_name}_sleeper "$@"
+    if test "${POD_SHARE_PID_NAMESPACE}" == "true"; then
+        POD_EXTRA_ARGS="--pid container:pod_${pod_name}_sleeper"
+    fi
+
+    docker run -it --rm --network container:pod_${pod_name}_sleeper ${POD_EXTRA_ARGS} "$@"
 }
 
 main "$@"
