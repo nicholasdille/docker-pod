@@ -40,7 +40,7 @@ The script can be source to use the functions `pod_<verb>`, run directly as well
 
 This plugin manages pod by creating a dummy container representing the pod.
 
-Additional containers are started next to the dummy container and shares the network as well as the PID namespace.
+Additional containers are started next to the dummy container and shares the network and optionally the PID namespace. If the environment variable `POD_SHARE_PID_NAMESPACE` is set to `true`, sharing the PID namespace is enabled.
 
 ## Usage
 
@@ -92,6 +92,8 @@ $ docker pod add foo dind --privileged docker:stable-dind dockerd --host tcp://1
 c7948a83120010330e7d789103b67fd7f6c0bad23e29be8d78102d00e78b1252
 ```
 
+If the environment variable `POD_SHARE_PID_NAMESPACE` is set to `true`, sharing the PID namespace is enabled.
+
 ### List pods
 
 The following command lists all containers belonging to the pod `foo`:
@@ -141,6 +143,8 @@ The `run` command accepts the Docker options before the image name as well as co
 $ docker pod run foo --read-only alpine mount | grep " on / "
 overlay on / type overlay (ro,relatime,lowerdir=/var/lib/docker/overlay2/l/RZVZH4MJEZPNPIKUHFBGHQXVRP:/var/lib/docker/overlay2/l/UC7XX6HQHKLGVSSKB5XEMZMF42,upperdir=/var/lib/docker/overlay2/08bc16d617f673774ce15ee1de6dcc87febb5c39249b45a46a2e407a03172e82/diff,workdir=/var/lib/docker/overlay2/08bc16d617f673774ce15ee1de6dcc87febb5c39249b45a46a2e407a03172e82/work)
 ```
+
+If the environment variable `POD_SHARE_PID_NAMESPACE` is set to `true`, sharing the PID namespace is enabled.
 
 ### Enter a container in the pod
 
