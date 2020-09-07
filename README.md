@@ -204,3 +204,26 @@ After the command has run, the pod is removed and accessing it produces and erro
 $ docker pod list foo
 ERROR: Pod foo does not exist.
 ```
+
+## Alternative: docker-compose
+
+`docker-compose` can be used as an alternative to this script because services can define the field `network_mode` to use the network namespace of an existing service:
+
+```yaml
+version: "3.3"
+
+services:
+
+  console:
+    image: docker:stable
+    command:
+    - sh
+    - -c
+    - while true; do sleep 5; done
+
+  registry:
+    image: registry:2
+    network_mode: service:console
+```
+
+See also `docker-compose.yaml` in this repository.
