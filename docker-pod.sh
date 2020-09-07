@@ -183,7 +183,7 @@ pod_create() {
         exit 1
     fi
 
-    docker run -d --name pod_${pod_name}_sleeper ubuntu bash -c 'sleep infinity'
+    docker run -d --name pod_${pod_name}_sleeper alpine sh -c 'while true; do sleep 5; done'
 }
 
 help_add() {
