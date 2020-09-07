@@ -4,6 +4,8 @@ Docker CLI plugin for managing pods
 
 This plugin add the manual management of pods to Docker. You can create a pods, add containers to a pod, remove containers from a pod as well as manage the containers (logs, exec).
 
+The script can be source to use the functions `pod_<verb>`, run directly as well as used as a Docker CLI plugin.
+
 ## Installation
 
 1. Please make sure you are running Docker 19.03.
