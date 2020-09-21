@@ -1,4 +1,9 @@
-version: "3.3"
+version: "3.4"
+
+x-pod-template: &pod
+  depends_on:
+  - pod
+  network_mode: service:pod
 
 services:
 
@@ -10,28 +15,22 @@ services:
     - while true; do sleep 5; done
 
   registry:
+    <<: *pod
     image: registry:2
-    depends_on:
-    - pod
-    network_mode: service:pod
 
   dind:
+    <<: *pod
     image: docker:stable-dind
     command:
     - dockerd
     - --host
     - tcp://127.0.0.1:2375
     privileged: true
-    depends_on:
-    - pod
-    network_mode: service:pod
 
   console:
+    <<: *pod
     image: docker:stable
     command:
     - sh
     - -c
     - while true; do sleep 5; done
-    depends_on:
-    - pod
-    network_mode: service:pod
